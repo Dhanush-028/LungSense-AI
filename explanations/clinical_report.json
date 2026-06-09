@@ -1,0 +1,62 @@
+{
+  "timestamp": "2026-05-18 15:15:50",
+  "tool_name": "LungSense AI",
+  "disclaimer": "This is an AI-assisted screening tool for educational purposes only. It is NOT a substitute for professional medical diagnosis.",
+  "prediction": {
+    "disease": "Wheeze",
+    "confidence": 87.3,
+    "urgency": "high",
+    "color": "#ff4d6d",
+    "all_probs": {
+      "Normal": 5.2,
+      "Crackle": 4.1,
+      "Wheeze": 87.3,
+      "Both": 3.4
+    }
+  },
+  "findings": {
+    "summary": "Wheeze sounds detected in lung audio.",
+    "detail": "Continuous high-pitched whistling sounds were identified during breathing. This pattern indicates narrowed or obstructed airways.",
+    "conditions": [
+      "Asthma",
+      "COPD",
+      "Bronchospasm",
+      "Allergic reaction"
+    ]
+  },
+  "advice": {
+    "patient_message": "Please seek medical advice soon. If you experience difficulty breathing, seek emergency care immediately.",
+    "next_steps": [
+      "See a doctor as soon as possible",
+      "Spirometry (lung function test)",
+      "Bronchodilator trial",
+      "Allergy testing if suspected"
+    ]
+  },
+  "doctor_note": "AI screening result: Wheeze detected. Recommend spirometry, bronchodilator response test, and clinical assessment for asthma or COPD.",
+  "explanation": {
+    "model_used": "CNN MobileNetV2",
+    "time_taken_sec": 4.2,
+    "top_features": [
+      {
+        "feature": "ZCR",
+        "importance": 0.082
+      },
+      {
+        "feature": "MFCC_mean_3",
+        "importance": 0.071
+      },
+      {
+        "feature": "Delta_mean_2",
+        "importance": 0.065
+      }
+    ],
+    "audio_highlight": {}
+  },
+  "risk": {
+    "score": 90,
+    "label": "Critical",
+    "color": "#ff4d6d",
+    "action": "Seek urgent medical attention"
+  }
+}

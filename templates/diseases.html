@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Diseases — LungSense AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #050d1a; --bg2: #0a1628; --card: #0f1e35;
+      --accent: #00c6ff; --accent2: #0072ff; --accent3: #00ffa3;
+      --text: #e8f4ff; --muted: #7a9bbf; --border: rgba(0,198,255,0.15);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 4rem;
+      background: rgba(5,13,26,0.85); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800;
+      background: linear-gradient(90deg, var(--accent), var(--accent3));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.92rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+    .nav-cta { background: linear-gradient(135deg, var(--accent2), var(--accent));
+      color: #fff !important; padding: 0.55rem 1.4rem; border-radius: 50px; font-weight: 600 !important; }
+
+    .page { padding: 8rem 2rem 5rem; max-width: 1080px; margin: 0 auto; }
+    .section-label { font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 0.8rem; }
+    h1 { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; margin-bottom: 0.8rem; }
+    .page-sub { color: var(--muted); font-size: 1rem; max-width: 560px; margin-bottom: 4rem; line-height: 1.7; }
+
+    /* DISEASE CARDS */
+    .disease-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 1.8rem; }
+
+    .disease-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 24px; overflow: hidden;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .disease-card:hover { transform: translateY(-4px); }
+
+    .card-header {
+      padding: 2rem 2rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 1.2rem;
+    }
+    .card-emoji { font-size: 2.5rem; }
+    .card-header-text {}
+    .card-tag {
+      display: inline-block; font-size: 0.72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      padding: 0.2rem 0.7rem; border-radius: 50px; margin-bottom: 0.4rem;
+    }
+    .tag-wheeze  { background: rgba(255,77,109,0.15); color: #ff4d6d; }
+    .tag-crackle { background: rgba(255,209,102,0.15); color: #ffd166; }
+    .tag-both    { background: rgba(255,77,109,0.15); color: #ff4d6d; }
+    .tag-normal  { background: rgba(0,255,163,0.15); color: #00ffa3; }
+
+    .card-header h2 { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; }
+
+    .card-body { padding: 1.8rem 2rem; }
+    .card-desc { color: var(--muted); font-size: 0.92rem; line-height: 1.7; margin-bottom: 1.5rem; }
+
+    .info-row { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .info-chip {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 0.8rem 1rem; flex: 1; min-width: 120px;
+    }
+    .info-chip label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 0.3rem; }
+    .info-chip span { font-size: 0.9rem; font-weight: 600; }
+
+    .symptom-list { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .symptom-list li {
+      background: rgba(0,198,255,0.07); border: 1px solid var(--border);
+      border-radius: 50px; padding: 0.28rem 0.8rem;
+      font-size: 0.8rem; color: var(--accent);
+    }
+
+    h3.section-mini { font-family: 'Syne', sans-serif; font-size: 0.8rem; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.7rem; }
+
+    /* SOUND WAVE VISUAL */
+    .sound-visual {
+      display: flex; align-items: center; justify-content: center;
+      gap: 3px; height: 40px; margin: 1.2rem 0;
+    }
+    .sv-bar {
+      border-radius: 3px; width: 4px;
+      animation: sv 1.4s ease-in-out infinite;
+    }
+    @keyframes sv { 0%,100%{transform:scaleY(0.3);} 50%{transform:scaleY(1);} }
+
+    /* COMPARISON TABLE */
+    .compare-section { margin-top: 4rem; }
+    .compare-section h2 { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; margin-bottom: 1.5rem; }
+    table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 16px; overflow: hidden; }
+    thead { background: var(--bg2); }
+    th { font-family: 'Syne', sans-serif; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding: 1rem 1.2rem; text-align: left; }
+    td { padding: 1rem 1.2rem; border-top: 1px solid var(--border); font-size: 0.9rem; color: var(--text); }
+    tr:hover td { background: rgba(0,198,255,0.03); }
+
+    footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; margin-top: 4rem; }
+    footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="logo" href="/">🫁 LungSense AI</a>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/predict">Diagnose</a></li>
+      <li><a href="/diseases" class="active">Diseases</a></li>
+      <li><a href="/games" class="active">Games</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/predict" class="nav-cta">Try Now →</a></li>
+    </ul>
+  </nav>
+
+  <div class="page">
+    <p class="section-label">Respiratory Conditions</p>
+    <h1>Diseases We Detect</h1>
+    <p class="page-sub">Our AI classifies 4 categories of respiratory sound patterns linked to these common lung diseases. Learn what each condition means and how it sounds.</p>
+
+    <div class="disease-grid">
+
+      <!-- ASTHMA -->
+      <div class="disease-card" style="border-color: rgba(255,77,109,0.25)">
+        <div class="card-header">
+          <div class="card-emoji">🌬️</div>
+          <div class="card-header-text">
+            <span class="card-tag tag-wheeze">Wheeze Pattern</span>
+            <h2>Asthma</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Asthma is a chronic condition where airways become inflamed and narrow, causing recurring episodes of wheezing, breathlessness, chest tightness, and coughing — especially at night or early morning.</p>
+          <div class="sound-visual">
+            <div class="sv-bar" style="height:12px;background:#ff4d6d;animation-delay:0s"></div>
+            <div class="sv-bar" style="height:28px;background:#ff4d6d;animation-delay:0.1s"></div>
+            <div class="sv-bar" style="height:36px;background:#ff4d6d;animation-delay:0.2s"></div>
+            <div class="sv-bar" style="height:30px;background:#ff4d6d;animation-delay:0.3s"></div>
+            <div class="sv-bar" style="height:38px;background:#ff4d6d;animation-delay:0.4s"></div>
+            <div class="sv-bar" style="height:32px;background:#ff4d6d;animation-delay:0.5s"></div>
+            <div class="sv-bar" style="height:40px;background:#ff4d6d;animation-delay:0.6s"></div>
+            <div class="sv-bar" style="height:28px;background:#ff4d6d;animation-delay:0.7s"></div>
+            <div class="sv-bar" style="height:18px;background:#ff4d6d;animation-delay:0.8s"></div>
+          </div>
+          <div class="info-row">
+            <div class="info-chip"><label>Affects</label><span>300M worldwide</span></div>
+            <div class="info-chip"><label>Age Group</label><span>All ages</span></div>
+            <div class="info-chip"><label>Sound</label><span>High-pitched wheeze</span></div>
+          </div>
+          <h3 class="section-mini">Key Symptoms</h3>
+          <ul class="symptom-list">
+            <li>Wheezing</li><li>Chest tightness</li><li>Shortness of breath</li>
+            <li>Night cough</li><li>Breathlessness</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PNEUMONIA -->
+      <div class="disease-card" style="border-color: rgba(255,209,102,0.25)">
+        <div class="card-header">
+          <div class="card-emoji">🫁</div>
+          <div class="card-header-text">
+            <span class="card-tag tag-crackle">Crackle Pattern</span>
+            <h2>Pneumonia</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Pneumonia is an infection that inflames the air sacs in one or both lungs, filling them with fluid or pus. It produces characteristic crackling sounds during inhalation — like walking on dry leaves.</p>
+          <div class="sound-visual">
+            <div class="sv-bar" style="height:8px;background:#ffd166;animation-delay:0s"></div>
+            <div class="sv-bar" style="height:35px;background:#ffd166;animation-delay:0.05s"></div>
+            <div class="sv-bar" style="height:10px;background:#ffd166;animation-delay:0.15s"></div>
+            <div class="sv-bar" style="height:38px;background:#ffd166;animation-delay:0.2s"></div>
+            <div class="sv-bar" style="height:12px;background:#ffd166;animation-delay:0.3s"></div>
+            <div class="sv-bar" style="height:40px;background:#ffd166;animation-delay:0.35s"></div>
+            <div class="sv-bar" style="height:9px;background:#ffd166;animation-delay:0.45s"></div>
+            <div class="sv-bar" style="height:33px;background:#ffd166;animation-delay:0.5s"></div>
+            <div class="sv-bar" style="height:11px;background:#ffd166;animation-delay:0.6s"></div>
+          </div>
+          <div class="info-row">
+            <div class="info-chip"><label>Affects</label><span>450M per year</span></div>
+            <div class="info-chip"><label>Age Group</label><span>All, esp. elderly</span></div>
+            <div class="info-chip"><label>Sound</label><span>Crackling pops</span></div>
+          </div>
+          <h3 class="section-mini">Key Symptoms</h3>
+          <ul class="symptom-list">
+            <li>Fever & chills</li><li>Crackling sounds</li><li>Productive cough</li>
+            <li>Chest pain</li><li>Fatigue</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- COPD -->
+      <div class="disease-card" style="border-color: rgba(255,77,109,0.25)">
+        <div class="card-header">
+          <div class="card-emoji">💨</div>
+          <div class="card-header-text">
+            <span class="card-tag tag-wheeze">Wheeze Pattern</span>
+            <h2>COPD</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Chronic Obstructive Pulmonary Disease is a group of progressive lung diseases — primarily emphysema and chronic bronchitis — that block airflow and make breathing increasingly difficult.</p>
+          <div class="sound-visual">
+            <div class="sv-bar" style="height:20px;background:#ff4d6d;animation-delay:0s"></div>
+            <div class="sv-bar" style="height:32px;background:#ff4d6d;animation-delay:0.15s"></div>
+            <div class="sv-bar" style="height:38px;background:#ff4d6d;animation-delay:0.3s"></div>
+            <div class="sv-bar" style="height:35px;background:#ff4d6d;animation-delay:0.45s"></div>
+            <div class="sv-bar" style="height:40px;background:#ff4d6d;animation-delay:0.6s"></div>
+            <div class="sv-bar" style="height:36px;background:#ff4d6d;animation-delay:0.75s"></div>
+            <div class="sv-bar" style="height:30px;background:#ff4d6d;animation-delay:0.9s"></div>
+            <div class="sv-bar" style="height:24px;background:#ff4d6d;animation-delay:1.05s"></div>
+            <div class="sv-bar" style="height:15px;background:#ff4d6d;animation-delay:1.2s"></div>
+          </div>
+          <div class="info-row">
+            <div class="info-chip"><label>Affects</label><span>200M globally</span></div>
+            <div class="info-chip"><label>Age Group</label><span>40+ years</span></div>
+            <div class="info-chip"><label>Sound</label><span>Persistent wheeze</span></div>
+          </div>
+          <h3 class="section-mini">Key Symptoms</h3>
+          <ul class="symptom-list">
+            <li>Chronic cough</li><li>Wheezing</li><li>Breathlessness</li>
+            <li>Mucus overproduction</li><li>Frequent infections</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- BRONCHITIS -->
+      <div class="disease-card" style="border-color: rgba(255,209,102,0.25)">
+        <div class="card-header">
+          <div class="card-emoji">🔴</div>
+          <div class="card-header-text">
+            <span class="card-tag tag-crackle">Crackle Pattern</span>
+            <h2>Bronchitis</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Bronchitis is inflammation of the bronchial tubes that carry air to and from the lungs. The inflamed tubes produce excess mucus, causing a persistent cough with crackling and rattling sounds.</p>
+          <div class="sound-visual">
+            <div class="sv-bar" style="height:10px;background:#ffd166;animation-delay:0s"></div>
+            <div class="sv-bar" style="height:30px;background:#ffd166;animation-delay:0.08s"></div>
+            <div class="sv-bar" style="height:12px;background:#ffd166;animation-delay:0.18s"></div>
+            <div class="sv-bar" style="height:36px;background:#ffd166;animation-delay:0.25s"></div>
+            <div class="sv-bar" style="height:14px;background:#ffd166;animation-delay:0.35s"></div>
+            <div class="sv-bar" style="height:38px;background:#ffd166;animation-delay:0.42s"></div>
+            <div class="sv-bar" style="height:10px;background:#ffd166;animation-delay:0.55s"></div>
+            <div class="sv-bar" style="height:34px;background:#ffd166;animation-delay:0.62s"></div>
+            <div class="sv-bar" style="height:12px;background:#ffd166;animation-delay:0.72s"></div>
+          </div>
+          <div class="info-row">
+            <div class="info-chip"><label>Type</label><span>Acute / Chronic</span></div>
+            <div class="info-chip"><label>Age Group</label><span>All ages</span></div>
+            <div class="info-chip"><label>Sound</label><span>Wet crackles</span></div>
+          </div>
+          <h3 class="section-mini">Key Symptoms</h3>
+          <ul class="symptom-list">
+            <li>Persistent cough</li><li>Mucus / phlegm</li><li>Crackling sounds</li>
+            <li>Low-grade fever</li><li>Chest discomfort</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COMPARISON TABLE -->
+    <div class="compare-section">
+      <h2>Quick Comparison</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Disease</th>
+            <th>Sound Type</th>
+            <th>Cause</th>
+            <th>Treatable?</th>
+            <th>Urgency</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>🌬️ Asthma</td>
+            <td>Wheeze</td>
+            <td>Airway inflammation</td>
+            <td>Yes — manageable</td>
+            <td>⚠️ Moderate</td>
+          </tr>
+          <tr>
+            <td>🫁 Pneumonia</td>
+            <td>Crackle</td>
+            <td>Bacterial/viral infection</td>
+            <td>Yes — antibiotics</td>
+            <td>🔴 High</td>
+          </tr>
+          <tr>
+            <td>💨 COPD</td>
+            <td>Wheeze</td>
+            <td>Smoking / pollution</td>
+            <td>Managed, not cured</td>
+            <td>⚠️ Moderate–High</td>
+          </tr>
+          <tr>
+            <td>🔴 Bronchitis</td>
+            <td>Crackle</td>
+            <td>Viral / irritants</td>
+            <td>Yes — rest + meds</td>
+            <td>🟡 Low–Moderate</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>
+    <p>🫁 LungSense AI — Mini  Project &nbsp;|&nbsp; <a href="/about">About</a></p>
+  </footer>
+
+</body>
+</html>

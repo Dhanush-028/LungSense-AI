@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lung Games — LungSense AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:#050d1a;--bg2:#0a1628;--card:#0f1e35;
+      --accent:#00c6ff;--accent2:#0072ff;--accent3:#00ffa3;
+      --text:#e8f4ff;--muted:#7a9bbf;--border:rgba(0,198,255,0.15);
+      --danger:#ff4d6d;--warn:#ffd166;--ok:#00ffa3;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.2rem 4rem;background:rgba(5,13,26,0.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
+    .logo{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;background:linear-gradient(90deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
+    .nav-links{display:flex;gap:2.5rem;list-style:none;}
+    .nav-links a{color:var(--muted);text-decoration:none;font-size:0.92rem;font-weight:500;transition:color 0.2s;}
+    .nav-links a:hover,.nav-links a.active{color:var(--accent);}
+    .nav-cta{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff!important;padding:0.55rem 1.4rem;border-radius:50px;font-weight:600!important;}
+    .page-header{padding:8rem 2rem 2rem;max-width:980px;margin:0 auto;text-align:center;}
+    .page-title{font-family:'Syne',sans-serif;font-size:2.6rem;font-weight:800;margin-bottom:0.6rem;}
+    .page-sub{color:var(--muted);font-size:1rem;max-width:520px;margin:0 auto 3rem;}
+    .games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;max-width:980px;margin:0 auto;padding:0 2rem 2rem;}
+    .game-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.8rem;cursor:pointer;transition:transform 0.25s,border-color 0.25s,box-shadow 0.25s;position:relative;overflow:hidden;}
+    .game-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.3s;border-radius:20px;}
+    .game-card.breath::before{background:radial-gradient(ellipse at 50% 0%,rgba(0,198,255,0.12),transparent 70%);}
+    .game-card.balloon::before{background:radial-gradient(ellipse at 50% 0%,rgba(0,255,163,0.12),transparent 70%);}
+    .game-card.oxygen::before{background:radial-gradient(ellipse at 50% 0%,rgba(255,209,102,0.12),transparent 70%);}
+    .game-card.deep::before{background:radial-gradient(ellipse at 50% 0%,rgba(255,209,102,0.12),transparent 70%);}
+    .game-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,0.3);}
+    .game-card:hover::before{opacity:1;}
+    .game-card.breath:hover{border-color:rgba(0,198,255,0.4);}
+    .game-card.balloon:hover{border-color:rgba(0,255,163,0.4);}
+    .game-card.oxygen:hover{border-color:rgba(255,209,102,0.4);}
+    .game-card.deep:hover{border-color:rgba(255,209,102,0.4);}
+    .card-icon{font-size:2.4rem;margin-bottom:1rem;display:block;}
+    .card-title{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:700;margin-bottom:0.4rem;}
+    .card-desc{color:var(--muted);font-size:0.88rem;line-height:1.6;margin-bottom:1.2rem;}
+    .card-badge{display:inline-block;padding:0.25rem 0.8rem;border-radius:50px;font-size:0.75rem;font-weight:700;}
+    .badge-easy{background:rgba(0,255,163,0.1);color:var(--ok);border:1px solid rgba(0,255,163,0.2);}
+    .badge-medium{background:rgba(255,209,102,0.1);color:var(--warn);border:1px solid rgba(255,209,102,0.2);}
+    .badge-hard{background:rgba(255,77,109,0.1);color:var(--danger);border:1px solid rgba(255,77,109,0.2);}
+    .play-btn{float:right;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border:none;padding:0.45rem 1.1rem;border-radius:50px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(5,13,26,0.92);backdrop-filter:blur(12px);z-index:200;align-items:center;justify-content:center;padding:1rem;}
+    .modal-overlay.open{display:flex;}
+    .modal{background:var(--card);border:1px solid var(--border);border-radius:28px;padding:2.5rem;max-width:540px;width:100%;position:relative;animation:popIn 0.35s cubic-bezier(.34,1.56,.64,1) both;max-height:90vh;overflow-y:auto;}
+    @keyframes popIn{from{opacity:0;transform:scale(0.88);}to{opacity:1;transform:scale(1);}}
+    .modal-close{position:absolute;top:1.2rem;right:1.4rem;background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;transition:color 0.2s;}
+    .modal-close:hover{color:var(--text);}
+    .game-title{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;margin-bottom:0.4rem;text-align:center;}
+    .game-sub{color:var(--muted);font-size:0.9rem;margin-bottom:1.5rem;text-align:center;}
+    .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.2rem;}
+    .stat-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:0.75rem;text-align:center;}
+    .stat-lbl{font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;}
+    .stat-val{font-size:1.4rem;font-weight:700;font-family:'Syne',sans-serif;}
+    .action-btn{width:100%;padding:1rem;border-radius:12px;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity 0.2s,transform 0.1s;border:none;color:#fff;background:linear-gradient(135deg,var(--accent2),var(--accent));user-select:none;-webkit-user-select:none;touch-action:none;}
+    .action-btn:hover{opacity:0.88;}
+    .action-btn:active{transform:scale(0.98);}
+    .action-btn:disabled{opacity:0.4;cursor:not-allowed;}
+    .prog-wrap{margin-bottom:0.5rem;}
+    .prog-labels{display:flex;justify-content:space-between;font-size:0.78rem;color:var(--muted);margin-bottom:5px;}
+    .prog-bg{height:10px;background:rgba(255,255,255,0.06);border-radius:50px;overflow:hidden;}
+    .prog-fill{height:100%;border-radius:50px;transition:width 0.08s,background 0.3s;}
+    .status-msg{text-align:center;font-size:0.88rem;color:var(--muted);min-height:20px;margin:0.6rem 0 1rem;}
+    .disclaimer-sm{font-size:0.76rem;color:var(--muted);margin-top:1rem;line-height:1.5;text-align:center;}
+    .disclaimer-sm strong{color:var(--danger);}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+    footer{text-align:center;padding:2rem;border-top:1px solid var(--border);color:var(--muted);font-size:0.85rem;margin-top:4rem;}
+    footer a{color:var(--accent);text-decoration:none;}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="/">🫁 LungSense AI</a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/predict">Diagnose</a></li>
+    <li><a href="/diseases">Diseases</a></li>
+    <li><a href="/games" class="active">Games</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/predict" class="nav-cta">Try Now →</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <h1 class="page-title">🫁 Lung Fitness Games</h1>
+  <p class="page-sub">Fun interactive challenges to test and train your lung strength. No equipment needed — just your breath.</p>
+</div>
+
+<div class="games-grid">
+  <div class="game-card breath" onclick="openModal('breathModal')">
+    <span class="card-icon">⏱️</span>
+    <div class="card-title">Breath Hold Challenge</div>
+    <div class="card-desc">Take a deep breath and hold as long as you can. Tests lung capacity and oxygen efficiency.</div>
+    <span class="card-badge badge-easy">Beginner</span>
+    <button class="play-btn">Play →</button>
+  </div>
+  <div class="game-card balloon" onclick="openModal('balloonModal')">
+    <span class="card-icon">🎈</span>
+    <div class="card-title">Balloon Inflator</div>
+    <div class="card-desc">Pump the balloon in short bursts — build pressure slowly. Hold too long and it pops!</div>
+    <span class="card-badge badge-medium">Intermediate</span>
+    <button class="play-btn">Play →</button>
+  </div>
+  <div class="game-card oxygen" onclick="openModal('oxygenModal')">
+    <span class="card-icon">⚡</span>
+    <div class="card-title">Oxygen Rush</div>
+    <div class="card-desc">Move your lungs to catch O₂ molecules and dodge CO₂. Speed increases with every level!</div>
+    <span class="card-badge badge-medium">Intermediate</span>
+    <button class="play-btn">Play →</button>
+  </div>
+  <div class="game-card deep" onclick="openModal('pacerModal')">
+    <span class="card-icon">🌬️</span>
+    <div class="card-title">4-7-8 Breathing Pacer</div>
+    <div class="card-desc">Follow the animated guide: inhale 4s, hold 7s, exhale 8s. Trains diaphragm and lung function.</div>
+    <span class="card-badge badge-hard">Advanced</span>
+    <button class="play-btn">Play →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL 1: BREATH HOLD
+══════════════════════════════════ -->
+<div class="modal-overlay" id="breathModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('breathModal')">✕</button>
+    <div class="game-title">⏱️ Breath Hold Challenge</div>
+    <div class="game-sub">How long can you hold your breath?</div>
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-lbl">Time</div><div class="stat-val" id="bh-time" style="color:var(--accent)">0s</div></div>
+      <div class="stat-box"><div class="stat-lbl">Best</div><div class="stat-val" id="bh-best">—</div></div>
+      <div class="stat-box"><div class="stat-lbl">Rating</div><div class="stat-val" id="bh-rating">—</div></div>
+    </div>
+    <div style="text-align:center;margin-bottom:1.2rem;">
+      <svg width="130" height="130" viewBox="0 0 130 130">
+        <circle cx="65" cy="65" r="56" fill="none" stroke="rgba(0,198,255,0.12)" stroke-width="7"/>
+        <circle id="bh-ring" cx="65" cy="65" r="56" fill="none" stroke="var(--accent)" stroke-width="7" stroke-linecap="round" stroke-dasharray="352" stroke-dashoffset="352" transform="rotate(-90 65 65)" style="transition:stroke 0.5s;"/>
+        <text x="65" y="60" text-anchor="middle" font-family="Syne,sans-serif" font-size="28" font-weight="800" fill="var(--text)" id="bh-num">0</text>
+        <text x="65" y="78" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="var(--muted)">seconds</text>
+      </svg>
+    </div>
+    <div class="status-msg" id="bh-phase">Ready to begin?</div>
+    <button class="action-btn" id="bh-btn" onclick="breathAction()">🫁 Start</button>
+    <div class="disclaimer-sm"><strong>⚠️</strong> Stop immediately if dizzy or uncomfortable. Never force breath holding.</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL 2: BALLOON INFLATOR
+══════════════════════════════════ -->
+<div class="modal-overlay" id="balloonModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('balloonModal')">✕</button>
+    <div class="game-title">🎈 Balloon Inflator</div>
+    <div class="game-sub">Short bursts = safe inflation. Long holds = POP!</div>
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-lbl">Inflated</div><div class="stat-val" id="bl-count" style="color:var(--ok)">0</div></div>
+      <div class="stat-box"><div class="stat-lbl">Popped</div><div class="stat-val" id="bl-pop" style="color:var(--danger)">0</div></div>
+      <div class="stat-box"><div class="stat-lbl">Best</div><div class="stat-val" id="bl-best">—</div></div>
+    </div>
+    <div style="text-align:center;margin-bottom:0.8rem;">
+      <svg id="bl-svg" width="200" height="220" viewBox="0 0 200 220">
+        <defs>
+          <radialGradient id="g-blue" cx="38%" cy="35%" r="60%"><stop offset="0%" stop-color="#B5D4F4"/><stop offset="100%" stop-color="#378ADD"/></radialGradient>
+          <radialGradient id="g-warn" cx="38%" cy="35%" r="60%"><stop offset="0%" stop-color="#FAC775"/><stop offset="100%" stop-color="#BA7517"/></radialGradient>
+          <radialGradient id="g-red"  cx="38%" cy="35%" r="60%"><stop offset="0%" stop-color="#F09595"/><stop offset="100%" stop-color="#A32D2D"/></radialGradient>
+        </defs>
+        <ellipse id="bl-body"   cx="100" cy="105" rx="32" ry="36" fill="url(#g-blue)"/>
+        <ellipse id="bl-shine"  cx="88"  cy="91"  rx="8"  ry="6"  fill="white" opacity="0.45"/>
+        <ellipse id="bl-knot"   cx="100" cy="141" rx="5"  ry="4"  fill="#185FA5"/>
+        <line    id="bl-string" x1="100" y1="145" x2="100" y2="200" stroke="#888780" stroke-width="1.5" stroke-linecap="round"/>
+        <text    id="bl-pct"    x="100"  y="108"  text-anchor="middle" dominant-baseline="middle" font-family="Syne,sans-serif" font-size="16" font-weight="700" fill="#042C53" opacity="0">0%</text>
+        <text    id="bl-pop-e"  x="100"  y="108"  text-anchor="middle" dominant-baseline="middle" font-size="52" opacity="0">💥</text>
+        <text    id="bl-win-e"  x="100"  y="108"  text-anchor="middle" dominant-baseline="middle" font-size="44" opacity="0">🎉</text>
+      </svg>
+    </div>
+    <div class="prog-wrap">
+      <div class="prog-labels"><span id="bl-bar-lbl">0%</span><span id="bl-zone" style="font-weight:600;"></span></div>
+      <div class="prog-bg"><div class="prog-fill" id="bl-prog" style="width:0%;background:var(--accent);"></div></div>
+    </div>
+    <div class="status-msg" id="bl-status">Press and hold to pump — short bursts work best!</div>
+    <button class="action-btn" id="bl-btn">Hold to Pump</button>
+    <div class="disclaimer-sm">Tip: release and re-press repeatedly rather than holding continuously</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL 3: OXYGEN RUSH
+══════════════════════════════════ -->
+<div class="modal-overlay" id="oxygenModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('oxygenModal')">✕</button>
+    <div class="game-title">⚡ Oxygen Rush</div>
+    <div class="game-sub">Catch O₂ — dodge CO₂. Move your mouse or drag!</div>
+    <div class="stat-row" style="grid-template-columns:repeat(4,1fr);">
+      <div class="stat-box"><div class="stat-lbl">Score</div><div class="stat-val" id="ox-score" style="color:var(--accent)">0</div></div>
+      <div class="stat-box"><div class="stat-lbl">Lives</div><div class="stat-val" id="ox-lives" style="color:var(--ok)">3</div></div>
+      <div class="stat-box"><div class="stat-lbl">Level</div><div class="stat-val" id="ox-level">1</div></div>
+      <div class="stat-box"><div class="stat-lbl">Best</div><div class="stat-val" id="ox-best">0</div></div>
+    </div>
+    <canvas id="ox-canvas" width="460" height="280" style="display:block;width:100%;border-radius:12px;border:1px solid var(--border);background:var(--bg2);touch-action:none;cursor:none;margin-bottom:0.8rem;"></canvas>
+    <div style="display:flex;gap:1rem;font-size:0.78rem;color:var(--muted);margin-bottom:1rem;flex-wrap:wrap;">
+      <span>🔵 O₂ = +10</span><span>🟡 Gold O₂ = +30</span><span>🔴 CO₂ = −1 life</span>
+    </div>
+    <button class="action-btn" id="ox-btn" onclick="toggleOxygen()" style="touch-action:auto;">▶ Start Game</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL 4: 4-7-8 PACER
+══════════════════════════════════ -->
+<div class="modal-overlay" id="pacerModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('pacerModal')">✕</button>
+    <div class="game-title">🌬️ 4-7-8 Breathing</div>
+    <div class="game-sub">Inhale 4s · Hold 7s · Exhale 8s</div>
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-lbl">Cycles</div><div class="stat-val" id="pc-cycles" style="color:var(--ok)">0</div></div>
+      <div class="stat-box"><div class="stat-lbl">Time</div><div class="stat-val" id="pc-time">0s</div></div>
+      <div class="stat-box"><div class="stat-lbl">Calm</div><div class="stat-val" id="pc-calm">0%</div></div>
+    </div>
+    <div style="text-align:center;margin-bottom:1rem;">
+      <svg width="160" height="160" viewBox="0 0 160 160">
+        <circle cx="80" cy="80" r="70" fill="none" stroke="rgba(255,209,102,0.12)" stroke-width="5"/>
+        <circle id="pc-ring" cx="80" cy="80" r="70" fill="none" stroke="var(--warn)" stroke-width="5" stroke-linecap="round" stroke-dasharray="440" stroke-dashoffset="440" transform="rotate(-90 80 80)" style="transition:stroke 0.4s;"/>
+        <circle id="pc-pulse" cx="80" cy="80" r="48" fill="rgba(255,209,102,0.18)" style="transition:r 0.05s;"/>
+        <text id="pc-instr" x="80" y="74" text-anchor="middle" font-family="Syne,sans-serif" font-size="13" font-weight="700" fill="var(--warn)">Ready</text>
+        <text id="pc-count" x="80" y="96" text-anchor="middle" font-family="Syne,sans-serif" font-size="26" font-weight="800" fill="var(--text)">—</text>
+      </svg>
+    </div>
+    <div class="status-msg" id="pc-advice">Follow the circle — breathe with it</div>
+    <button class="action-btn" id="pc-btn" onclick="pacerAction()">🌬️ Start Session</button>
+    <div class="disclaimer-sm"><strong>⚠️</strong> Stop if lightheaded. Consult a doctor if you have a respiratory condition.</div>
+  </div>
+</div>
+
+<footer>
+  <p>🫁 LungSense AI — Mini Project &nbsp;|&nbsp; <a href="/about">About</a></p>
+</footer>
+
+<script>
+/* ── MODAL ── */
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  if(id==='breathModal')  resetBreath();
+  if(id==='balloonModal') resetBalloon();
+  if(id==='oxygenModal')  stopOxygen();
+  if(id==='pacerModal')   resetPacer();
+}
+
+/* ════════════════════════════════
+   GAME 1 — BREATH HOLD
+════════════════════════════════ */
+let bhState='idle',bhInterval=null,bhSeconds=0,bhBest=0;
+const BH_MAX=180;
+
+function breathAction(){
+  if(bhState==='idle'||bhState==='done') startBhInhale();
+  else if(bhState==='inhale') startBhHold();
+  else if(bhState==='hold') endBhHold();
+}
+function startBhInhale(){
+  bhState='inhale'; bhSeconds=0;
+  document.getElementById('bh-phase').textContent='Breathe in deeply…';
+  document.getElementById('bh-phase').style.color='var(--accent)';
+  document.getElementById('bh-btn').textContent='✅ Done inhaling — Hold!';
+  setRing(0,BH_MAX,'var(--accent)');
+}
+function startBhHold(){
+  bhState='hold';
+  document.getElementById('bh-phase').textContent='HOLD your breath! 💪';
+  document.getElementById('bh-phase').style.color='var(--ok)';
+  document.getElementById('bh-btn').textContent='😮‍💨 Release — Done!';
+  document.getElementById('bh-btn').style.background='linear-gradient(135deg,#c0142a,var(--danger))';
+  bhInterval=setInterval(()=>{
+    bhSeconds++;
+    document.getElementById('bh-num').textContent=bhSeconds;
+    document.getElementById('bh-time').textContent=bhSeconds+'s';
+    setRing(bhSeconds,BH_MAX,bhSeconds<BH_MAX*0.4?'var(--ok)':bhSeconds<BH_MAX*0.7?'var(--warn)':'var(--danger)');
+  },1000);
+}
+function endBhHold(){
+  clearInterval(bhInterval); bhState='done';
+  document.getElementById('bh-btn').style.background='';
+  document.getElementById('bh-btn').textContent='🔄 Try Again';
+  document.getElementById('bh-phase').textContent='Great! Exhale slowly 😌';
+  document.getElementById('bh-phase').style.color='var(--ok)';
+  if(bhSeconds>bhBest){ bhBest=bhSeconds; document.getElementById('bh-best').textContent=bhBest+'s'; }
+  let r='😅 Keep practising!';
+  if(bhSeconds>=15) r='👍 Decent!';
+  if(bhSeconds>=30) r='💪 Good!';
+  if(bhSeconds>=60) r='🔥 Excellent!';
+  if(bhSeconds>=90) r='🏆 Elite!';
+  document.getElementById('bh-rating').textContent=r;
+}
+function setRing(val,max,color){
+  const off=352-(352*Math.min(val/max,1));
+  const ring=document.getElementById('bh-ring');
+  ring.style.strokeDashoffset=off;
+  ring.style.stroke=color;
+}
+function resetBreath(){
+  clearInterval(bhInterval); bhState='idle'; bhSeconds=0;
+  document.getElementById('bh-num').textContent='0';
+  document.getElementById('bh-time').textContent='0s';
+  document.getElementById('bh-phase').textContent='Ready to begin?';
+  document.getElementById('bh-phase').style.color='var(--muted)';
+  document.getElementById('bh-btn').textContent='🫁 Start';
+  document.getElementById('bh-btn').style.background='';
+  setRing(0,BH_MAX,'var(--accent)');
+}
+
+/* ════════════════════════════════
+   GAME 2 — BALLOON INFLATOR
+════════════════════════════════ */
+let blLevel=0,blPressure=0,blHolding=false,blState='ready',blTickId=null,blStart=null,blInflated=0,blPopped=0,blBest=null;
+const BL_TICK=50,BL_FILL=1.8,BL_DRAIN=0.6,BL_PRES_UP=3.5,BL_PRES_DN=6,BL_POP=100,BL_DANGER=70;
+
+function blTick(){
+  if(blState!=='playing') return;
+  if(blHolding){ blLevel=Math.min(blLevel+BL_FILL,110); blPressure=Math.min(blPressure+BL_PRES_UP,120); }
+  else{ blPressure=Math.max(blPressure-BL_PRES_DN,0); blLevel=Math.max(blLevel-BL_DRAIN,0); }
+  if(blPressure>=BL_POP){ blDoPop(); return; }
+  if(blLevel>=100&&blPressure<80){ blDoWin(); return; }
+  blUpdateVis();
+  const msg=blHolding&&blPressure>=80?'Too much pressure — release now!':blHolding&&blLevel>=BL_DANGER?'Danger zone — use short bursts!':blHolding?'Pumping…':blLevel>0?'Released — hold again to continue':'Press and hold to pump';
+  const col=blHolding&&blPressure>=80?'var(--danger)':blHolding&&blLevel>=BL_DANGER?'var(--warn)':blHolding?'var(--accent)':'var(--muted)';
+  document.getElementById('bl-status').textContent=msg;
+  document.getElementById('bl-status').style.color=col;
+}
+function blUpdateVis(){
+  const pct=Math.min(blLevel,100);
+  const rx=28+pct*0.55, ry=32+pct*0.62, cy=120-pct*0.22;
+  const b=document.getElementById('bl-body');
+  b.setAttribute('cx','100'); b.setAttribute('cy',String(Math.round(cy)));
+  b.setAttribute('rx',String(Math.round(rx))); b.setAttribute('ry',String(Math.round(ry)));
+  b.setAttribute('fill',pct<50?'url(#g-blue)':pct<80?'url(#g-warn)':'url(#g-red)');
+  const sh=document.getElementById('bl-shine');
+  sh.setAttribute('cx',String(Math.round(100-rx*0.35))); sh.setAttribute('cy',String(Math.round(cy-ry*0.35)));
+  sh.setAttribute('rx',String(Math.round(rx*0.25))); sh.setAttribute('ry',String(Math.round(ry*0.15)));
+  document.getElementById('bl-knot').setAttribute('cy',String(Math.round(cy+ry+2)));
+  document.getElementById('bl-knot').setAttribute('fill',pct<50?'#185FA5':pct<80?'#633806':'#791F1F');
+  document.getElementById('bl-pct').setAttribute('y',String(Math.round(cy)));
+  document.getElementById('bl-pct').textContent=Math.round(pct)+'%';
+  document.getElementById('bl-pct').setAttribute('opacity',pct>10?'0.9':'0');
+  document.getElementById('bl-prog').style.width=pct+'%';
+  document.getElementById('bl-prog').style.background=pct>=BL_DANGER?'var(--danger)':pct>=50?'var(--warn)':'var(--accent)';
+  document.getElementById('bl-bar-lbl').textContent=Math.round(pct)+'%';
+  if(blLevel>=BL_DANGER){ document.getElementById('bl-zone').textContent='Pressure: '+Math.round(Math.min(blPressure/BL_POP*100,100))+'%'; document.getElementById('bl-zone').style.color='var(--danger)'; }
+  else if(blLevel>=50){ document.getElementById('bl-zone').textContent='Getting full!'; document.getElementById('bl-zone').style.color='var(--warn)'; }
+  else{ document.getElementById('bl-zone').textContent=''; }
+}
+function blDoPop(){
+  blState='done'; blHolding=false; clearInterval(blTickId); blPopped++;
+  document.getElementById('bl-pop').textContent=blPopped;
+  ['bl-body','bl-shine','bl-knot','bl-string','bl-pct'].forEach(id=>document.getElementById(id).setAttribute('opacity','0'));
+  document.getElementById('bl-pop-e').setAttribute('opacity','1');
+  document.getElementById('bl-status').textContent='Popped! Too much pressure built up.';
+  document.getElementById('bl-status').style.color='var(--danger)';
+  document.getElementById('bl-btn').textContent='Try Again'; blHolding=false;
+}
+function blDoWin(){
+  blState='done'; blHolding=false; clearInterval(blTickId); blInflated++;
+  document.getElementById('bl-count').textContent=blInflated;
+  const elapsed=((Date.now()-blStart)/1000).toFixed(1);
+  if(!blBest||parseFloat(elapsed)<parseFloat(blBest)){ blBest=elapsed; document.getElementById('bl-best').textContent=blBest+'s'; }
+  blLevel=100; blUpdateVis();
+  document.getElementById('bl-win-e').setAttribute('opacity','1');
+  setTimeout(()=>document.getElementById('bl-win-e').setAttribute('opacity','0'),1200);
+  document.getElementById('bl-status').textContent='Perfect! Inflated in '+elapsed+'s 🎉';
+  document.getElementById('bl-status').style.color='var(--ok)';
+  document.getElementById('bl-btn').textContent='Inflate Another!';
+}
+function blStartHold(e){
+  e.preventDefault();
+  if(blState==='done'){ resetBalloon(); return; }
+  if(blState==='ready'){ blState='playing'; blStart=Date.now(); blTickId=setInterval(blTick,BL_TICK); }
+  if(blState!=='playing') return;
+  blHolding=true; document.getElementById('bl-btn').textContent='Pumping…';
+}
+function blStopHold(e){
+  e.preventDefault();
+  if(blState!=='playing') return;
+  blHolding=false; document.getElementById('bl-btn').textContent='Hold to Pump';
+}
+function resetBalloon(){
+  blLevel=0; blPressure=0; blHolding=false; blState='ready'; clearInterval(blTickId);
+  ['bl-body','bl-shine','bl-knot','bl-string'].forEach(id=>document.getElementById(id).setAttribute('opacity','1'));
+  document.getElementById('bl-pop-e').setAttribute('opacity','0');
+  document.getElementById('bl-win-e').setAttribute('opacity','0');
+  blUpdateVis(); document.getElementById('bl-zone').textContent='';
+  document.getElementById('bl-status').textContent='Press and hold to pump — short bursts work best!';
+  document.getElementById('bl-status').style.color='var(--muted)';
+  document.getElementById('bl-btn').textContent='Hold to Pump';
+}
+(function(){
+  const btn=document.getElementById('bl-btn');
+  btn.addEventListener('mousedown',blStartHold);
+  btn.addEventListener('mouseup',blStopHold);
+  btn.addEventListener('mouseleave',blStopHold);
+  btn.addEventListener('touchstart',blStartHold,{passive:false});
+  btn.addEventListener('touchend',blStopHold,{passive:false});
+  btn.addEventListener('touchcancel',blStopHold,{passive:false});
+  resetBalloon();
+})();
+
+/* ════════════════════════════════
+   GAME 3 — OXYGEN RUSH
+════════════════════════════════ */
+const oxCanvas=document.getElementById('ox-canvas');
+const oxCtx=oxCanvas.getContext('2d');
+const OW=460,OH=280;
+let oxRunning=false,oxScore=0,oxLives=3,oxLevel=1,oxBest=0;
+let oxPlayerX=OW/2,oxParticles=[],oxRafId=null,oxFrame=0,oxSpawnRate=70;
+let oxFlashMsg='',oxFlashTimer=0,oxFlashColor='';
+
+function oxRnd(a,b){return a+Math.random()*(b-a);}
+function oxSpawn(){
+  const r=Math.random();
+  const type=r<0.55?'o2':r<0.82?'co2':'gold';
+  oxParticles.push({x:oxRnd(14,OW-14),y:-14,r:type==='gold'?10:9,vy:oxRnd(1.2,2.0)+oxLevel*0.22,vx:oxRnd(-0.4,0.4),type,alpha:1});
+}
+function oxDraw(){
+  oxCtx.clearRect(0,0,OW,OH);
+  oxCtx.fillStyle='#0a1628'; oxCtx.fillRect(0,0,OW,OH);
+  oxParticles.forEach(p=>{
+    oxCtx.globalAlpha=p.alpha;
+    oxCtx.beginPath(); oxCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    oxCtx.fillStyle=p.type==='co2'?'#E24B4A':p.type==='gold'?'#EF9F27':'#378ADD';
+    oxCtx.fill();
+    oxCtx.font=`bold ${p.r<10?8:9}px sans-serif`;
+    oxCtx.fillStyle='#fff'; oxCtx.textAlign='center'; oxCtx.textBaseline='middle';
+    oxCtx.fillText(p.type==='co2'?'CO₂':'O₂',p.x,p.y);
+    oxCtx.globalAlpha=1;
+  });
+  const py=OH-28;
+  oxCtx.fillStyle='#185FA5';
+  oxCtx.beginPath(); oxCtx.ellipse(oxPlayerX-18,py,15,19,-0.28,0,Math.PI*2); oxCtx.fill();
+  oxCtx.beginPath(); oxCtx.ellipse(oxPlayerX+18,py,15,19,0.28,0,Math.PI*2);  oxCtx.fill();
+  oxCtx.fillStyle='#0C447C';
+  oxCtx.beginPath(); oxCtx.ellipse(oxPlayerX,py+5,7,9,0,0,Math.PI*2); oxCtx.fill();
+  if(oxFlashTimer>0){
+    oxCtx.font='bold 20px sans-serif'; oxCtx.fillStyle=oxFlashColor;
+    oxCtx.textAlign='center'; oxCtx.fillText(oxFlashMsg,OW/2,OH/2-20);
+    oxFlashTimer--;
+  }
+}
+function oxFlash(msg,color){oxFlashMsg=msg;oxFlashTimer=35;oxFlashColor=color;}
+function oxLoop(ts){
+  if(!oxRunning) return;
+  oxFrame++;
+  if(oxFrame%oxSpawnRate===0) oxSpawn();
+  const py=OH-28;
+  for(let i=oxParticles.length-1;i>=0;i--){
+    const p=oxParticles[i];
+    p.x+=p.vx; p.y+=p.vy;
+    const dx=p.x-oxPlayerX,dy=p.y-py;
+    if(Math.sqrt(dx*dx+dy*dy)<p.r+24){
+      if(p.type==='o2'){oxScore+=10;oxFlash('+10','#378ADD');}
+      else if(p.type==='gold'){oxScore+=30;oxFlash('+30 Gold!','#EF9F27');}
+      else{
+        oxLives--; oxFlash('-1 Life!','#E24B4A');
+        document.getElementById('ox-lives').textContent=oxLives;
+        if(oxLives<=0){oxEndGame();return;}
+      }
+      document.getElementById('ox-score').textContent=oxScore;
+      const nl=Math.min(8,1+Math.floor(oxScore/80));
+      if(nl!==oxLevel){oxLevel=nl;oxSpawnRate=Math.max(28,70-oxLevel*5);document.getElementById('ox-level').textContent=oxLevel;oxFlash('Level '+oxLevel+'!','#EF9F27');}
+      oxParticles.splice(i,1); continue;
+    }
+    if(p.y>OH+20){oxParticles.splice(i,1);continue;}
+  }
+  oxDraw();
+  oxRafId=requestAnimationFrame(oxLoop);
+}
+function toggleOxygen(){oxRunning?oxEndGame():oxStartGame();}
+function oxStartGame(){
+  oxRunning=true;oxScore=0;oxLives=3;oxLevel=1;oxFrame=0;oxSpawnRate=70;oxParticles=[];oxFlashMsg='';oxFlashTimer=0;
+  document.getElementById('ox-score').textContent='0';
+  document.getElementById('ox-lives').textContent='3';
+  document.getElementById('ox-level').textContent='1';
+  document.getElementById('ox-btn').textContent='⏹ Stop';
+  oxRafId=requestAnimationFrame(oxLoop);
+}
+function oxEndGame(){
+  oxRunning=false; cancelAnimationFrame(oxRafId); oxParticles=[];
+  if(oxScore>oxBest){oxBest=oxScore;document.getElementById('ox-best').textContent=oxBest;}
+  document.getElementById('ox-btn').textContent='▶ Play Again';
+  oxCtx.clearRect(0,0,OW,OH);
+  oxCtx.fillStyle='#0a1628'; oxCtx.fillRect(0,0,OW,OH);
+  oxCtx.font='bold 22px sans-serif'; oxCtx.fillStyle='#e8f4ff'; oxCtx.textAlign='center';
+  oxCtx.fillText('Game Over',OW/2,OH/2-16);
+  oxCtx.font='16px sans-serif'; oxCtx.fillStyle='#7a9bbf';
+  oxCtx.fillText('Score: '+oxScore+(oxScore===oxBest&&oxScore>0?' — New Best!':''),OW/2,OH/2+14);
+}
+function stopOxygen(){
+  oxRunning=false; cancelAnimationFrame(oxRafId);
+  document.getElementById('ox-btn').textContent='▶ Start Game';
+  document.getElementById('ox-score').textContent='0';
+  document.getElementById('ox-lives').textContent='3';
+  document.getElementById('ox-level').textContent='1';
+  oxParticles=[]; oxScore=0; oxLives=3; oxLevel=1; oxFrame=0;
+  oxCtx.clearRect(0,0,OW,OH);
+  oxCtx.fillStyle='#0a1628'; oxCtx.fillRect(0,0,OW,OH);
+  oxCtx.font='16px sans-serif'; oxCtx.fillStyle='#7a9bbf'; oxCtx.textAlign='center';
+  oxCtx.fillText('Press Start to play',OW/2,OH/2);
+}
+oxCanvas.addEventListener('mousemove',e=>{
+  const r=oxCanvas.getBoundingClientRect();
+  oxPlayerX=Math.max(34,Math.min(OW-34,(e.clientX-r.left)*(OW/r.width)));
+});
+oxCanvas.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  const r=oxCanvas.getBoundingClientRect();
+  oxPlayerX=Math.max(34,Math.min(OW-34,(e.touches[0].clientX-r.left)*(OW/r.width)));
+},{passive:false});
+stopOxygen();
+
+/* ════════════════════════════════
+   GAME 4 — 4-7-8 PACER
+════════════════════════════════ */
+const PC_SEQ=[
+  {name:'inhale',label:'Inhale',dur:4,color:'var(--accent)'},
+  {name:'hold',  label:'Hold',  dur:7,color:'var(--ok)'},
+  {name:'exhale',label:'Exhale',dur:8,color:'var(--warn)'},
+  {name:'rest',  label:'Rest',  dur:1,color:'var(--muted)'},
+];
+const PC_CIRC=440;
+let pcRunning=false,pcElapsed=0,pcPhaseIdx=0,pcPhaseTime=0,pcCycles=0,pcTotalTime=0,pcInterval=null,pcLastIdx=-1;
+
+function pcGetPhase(t){
+  const total=PC_SEQ.reduce((s,p)=>s+p.dur,0);
+  let ct=t%total,acc=0;
+  for(let i=0;i<PC_SEQ.length;i++){
+    acc+=PC_SEQ[i].dur;
+    if(ct<acc) return{phase:PC_SEQ[i],idx:i,pct:(ct-(acc-PC_SEQ[i].dur))/PC_SEQ[i].dur};
+  }
+  return{phase:PC_SEQ[0],idx:0,pct:0};
+}
+function pacerAction(){pcRunning?stopPacer():startPacer();}
+function startPacer(){
+  pcRunning=true;pcElapsed=0;pcPhaseTime=0;pcCycles=0;pcTotalTime=0;pcLastIdx=-1;
+  document.getElementById('pc-btn').textContent='⏹ Stop';
+  pcInterval=setInterval(pcTick,100);
+}
+function pcTick(){
+  pcElapsed+=0.1;pcTotalTime+=0.1;
+  const{phase,idx,pct}=pcGetPhase(pcElapsed);
+  if(idx!==pcLastIdx){
+    pcLastIdx=idx;
+    if(idx===0&&pcElapsed>0.5){pcCycles++;document.getElementById('pc-cycles').textContent=pcCycles;}
+    document.getElementById('pc-instr').textContent=phase.label;
+    document.getElementById('pc-instr').setAttribute('fill',phase.color.replace('var(--accent)','#00c6ff').replace('var(--ok)','#00ffa3').replace('var(--warn)','#ffd166').replace('var(--muted)','#7a9bbf'));
+    document.getElementById('pc-ring').style.stroke=phase.color.replace('var(--accent)','#00c6ff').replace('var(--ok)','#00ffa3').replace('var(--warn)','#ffd166').replace('var(--muted)','#7a9bbf');
+    const adviceMap={inhale:'Breathe in slowly and deeply…',hold:'Hold your breath gently…',exhale:'Release slowly through your mouth…',rest:'Rest and prepare for next cycle…'};
+    document.getElementById('pc-advice').textContent=adviceMap[phase.name];
+  }
+  const offset=PC_CIRC-(PC_CIRC*pct);
+  document.getElementById('pc-ring').style.strokeDashoffset=offset;
+  const scale=phase.name==='inhale'?0.7+pct*0.6:phase.name==='hold'?1.3:phase.name==='exhale'?1.3-pct*0.6:0.7;
+  document.getElementById('pc-pulse').setAttribute('r',String(Math.round(48*scale)));
+  document.getElementById('pc-count').textContent=Math.ceil(phase.dur-phase.dur*pct)+'s';
+  document.getElementById('pc-time').textContent=Math.round(pcTotalTime)+'s';
+  document.getElementById('pc-calm').textContent=Math.min(Math.round((pcCycles/8)*100),100)+'%';
+}
+function stopPacer(){
+  clearInterval(pcInterval);pcRunning=false;
+  document.getElementById('pc-btn').textContent='🌬️ Start Again';
+  document.getElementById('pc-instr').textContent='Done ✅';
+  document.getElementById('pc-count').textContent='—';
+  document.getElementById('pc-advice').textContent='Great session! You completed '+pcCycles+' cycles.';
+}
+function resetPacer(){
+  stopPacer();pcCycles=0;pcTotalTime=0;pcElapsed=0;pcLastIdx=-1;
+  document.getElementById('pc-cycles').textContent='0';
+  document.getElementById('pc-time').textContent='0s';
+  document.getElementById('pc-calm').textContent='0%';
+  document.getElementById('pc-instr').textContent='Ready';
+  document.getElementById('pc-count').textContent='—';
+  document.getElementById('pc-advice').textContent='Follow the circle — breathe with it';
+  document.getElementById('pc-ring').style.strokeDashoffset=PC_CIRC;
+  document.getElementById('pc-pulse').setAttribute('r','48');
+  document.getElementById('pc-btn').textContent='🌬️ Start Session';
+}
+</script>
+</body>
+</html>

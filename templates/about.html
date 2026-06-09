@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About — LungSense AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #050d1a; --bg2: #0a1628; --card: #0f1e35;
+      --accent: #00c6ff; --accent2: #0072ff; --accent3: #00ffa3;
+      --text: #e8f4ff; --muted: #7a9bbf; --border: rgba(0,198,255,0.15);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 4rem;
+      background: rgba(5,13,26,0.85); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800;
+      background: linear-gradient(90deg, var(--accent), var(--accent3));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.92rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+    .nav-cta { background: linear-gradient(135deg, var(--accent2), var(--accent));
+      color: #fff !important; padding: 0.55rem 1.4rem; border-radius: 50px; font-weight: 600 !important; }
+
+    .page { padding: 8rem 2rem 5rem; max-width: 960px; margin: 0 auto; }
+
+    /* HERO */
+    .about-hero {
+      text-align: center; margin-bottom: 5rem;
+      animation: fadeUp 0.8s ease both;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(30px);} to{opacity:1;transform:translateY(0);} }
+    .section-label { font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 0.8rem; }
+    h1 { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; margin-bottom: 1rem; }
+    .about-hero p { color: var(--muted); font-size: 1.05rem; line-height: 1.75; max-width: 600px; margin: 0 auto; }
+
+    /* PROJECT OVERVIEW */
+    .overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 4rem; }
+    .overview-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 2rem;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .overview-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+    .ov-icon { font-size: 2rem; margin-bottom: 1rem; display: block; }
+    .overview-card h3 { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 0.6rem; }
+    .overview-card p { color: var(--muted); font-size: 0.88rem; line-height: 1.65; }
+
+    /* TEAM */
+    h2 { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .section-sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 2.5rem; }
+
+    .team-grid { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 4rem; }
+    .team-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 2rem; flex: 1; min-width: 220px;
+      text-align: center; transition: transform 0.3s, border-color 0.3s;
+    }
+    .team-card:hover { transform: translateY(-4px); border-color: var(--accent3); }
+    .avatar {
+      width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 1rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+    }
+    .team-card h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .team-card .role { color: var(--accent); font-size: 0.82rem; font-weight: 600; margin-bottom: 0.6rem; }
+    .team-card p { color: var(--muted); font-size: 0.84rem; line-height: 1.5; }
+
+    /* TECH STACK */
+    .tech-section { margin-bottom: 4rem; }
+    .tech-grid { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .tech-pill {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 0.8rem 1.2rem;
+      display: flex; align-items: center; gap: 0.7rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .tech-pill:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .tech-pill .tp-icon { font-size: 1.4rem; }
+    .tech-pill .tp-name { font-weight: 600; font-size: 0.9rem; }
+    .tech-pill .tp-desc { color: var(--muted); font-size: 0.78rem; }
+
+    /* DATASET */
+    .dataset-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 2.5rem; margin-bottom: 4rem;
+    }
+    .dataset-card h2 { margin-bottom: 1rem; }
+    .dataset-card p { color: var(--muted); font-size: 0.92rem; line-height: 1.7; margin-bottom: 1.5rem; }
+    .dataset-stats { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .ds-stat { text-align: center; }
+    .ds-num {
+      font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800;
+      background: linear-gradient(90deg, var(--accent), var(--accent3));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .ds-label { color: var(--muted); font-size: 0.8rem; margin-top: 0.2rem; }
+
+    /* TIMELINE */
+    .timeline { position: relative; margin-bottom: 4rem; }
+    .timeline::before {
+      content: ''; position: absolute; left: 20px; top: 0; bottom: 0;
+      width: 2px; background: linear-gradient(to bottom, var(--accent2), var(--accent3));
+    }
+    .tl-item { display: flex; gap: 1.5rem; margin-bottom: 2rem; padding-left: 0.5rem; }
+    .tl-dot {
+      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      display: flex; align-items: center; justify-content: center; font-size: 1rem;
+      position: relative; z-index: 1; box-shadow: 0 0 0 4px var(--bg);
+    }
+    .tl-content { padding-top: 0.4rem; }
+    .tl-week { font-size: 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-bottom: 0.3rem; }
+    .tl-content h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .tl-content p { color: var(--muted); font-size: 0.87rem; line-height: 1.55; }
+
+    /* CTA */
+    .cta-box {
+      background: linear-gradient(135deg, rgba(0,114,255,0.15), rgba(0,198,255,0.08));
+      border: 1px solid var(--border); border-radius: 20px;
+      padding: 3rem; text-align: center; margin-bottom: 4rem;
+    }
+    .cta-box h2 { margin-bottom: 0.8rem; }
+    .cta-box p { color: var(--muted); margin-bottom: 2rem; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      color: #fff; padding: 0.9rem 2.2rem; border-radius: 50px;
+      font-weight: 600; font-size: 1rem; text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 8px 32px rgba(0,114,255,0.35); display: inline-block;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,114,255,0.5); }
+
+    footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    @media (max-width: 640px) { .overview-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="logo" href="/">🫁 LungSense AI</a>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/predict">Diagnose</a></li>
+      <li><a href="/diseases">Diseases</a></li>
+      <li><a href="/games" class="active">Games</a></li>
+      <li><a href="/about" class="active">About</a></li>
+      <li><a href="/predict" class="nav-cta">Try Now →</a></li>
+    </ul>
+  </nav>
+
+  <div class="page">
+
+    <!-- HERO -->
+    <div class="about-hero">
+      
+      <h1>About LungSense AI</h1>
+      <p>A machine learning system that detects respiratory diseases from lung sound recordings — built as a mini project using the ICBHI 2017 dataset and trained with Random Forest classification.</p>
+    </div>
+
+    <!-- OVERVIEW -->
+    <div class="overview-grid" style="margin-bottom:4rem">
+      <div class="overview-card">
+        <span class="ov-icon">🎯</span>
+        <h3>Project Goal</h3>
+        <p>Build an AI model that can classify lung sounds into Normal, Crackle, Wheeze, or Both — and serve the results through a web application accessible to anyone.</p>
+      </div>
+      <div class="overview-card">
+        <span class="ov-icon">🌍</span>
+        <h3>Real-World Impact</h3>
+        <p>Respiratory diseases affect 1 billion people worldwide. This tool aims to enable early screening in resource-limited settings where stethoscope-trained doctors are scarce.</p>
+      </div>
+      <div class="overview-card">
+        <span class="ov-icon">🧠</span>
+        <h3>How It Works</h3>
+        <p>Audio → MFCC feature extraction (122 features per segment) → Random Forest Classifier → Prediction with confidence score.</p>
+      </div>
+      <div class="overview-card">
+        <span class="ov-icon">📊</span>
+        <h3>Model Performance</h3>
+        <p>Trained on 6,898 respiratory cycles from 126 patients. Handles class imbalance with <code>class_weight='balanced'</code>. Target accuracy: 80%+.</p>
+      </div>
+    </div>
+
+    <!-- TECH STACK -->
+    <div class="tech-section">
+      <h2>🛠️ Tech Stack</h2>
+      <p class="section-sub">Everything used to build this project.</p>
+      <div class="tech-grid">
+        <div class="tech-pill"><span class="tp-icon">🐍</span><div><div class="tp-name">Python 3.12</div><div class="tp-desc">Core language</div></div></div>
+        <div class="tech-pill"><span class="tp-icon">🎵</span><div><div class="tp-name">librosa 0.11</div><div class="tp-desc">Audio feature extraction</div></div></div>
+        <div class="tech-pill"><span class="tp-icon">🌲</span><div><div class="tp-name">scikit-learn</div><div class="tp-desc">Random Forest model</div></div></div>
+        <div class="tech-pill"><span class="tp-icon">🔢</span><div><div class="tp-name">NumPy / Pandas</div><div class="tp-desc">Data handling</div></div></div>
+        <div class="tech-pill"><span class="tp-icon">🌐</span><div><div class="tp-name">Flask 3.1</div><div class="tp-desc">Web framework</div></div></div>
+        <div class="tech-pill"><span class="tp-icon">📦</span><div><div class="tp-name">joblib</div><div class="tp-desc">Model serialisation</div></div></div>
+        <div class="tech-pill"><span class="tp-icon">🎨</span><div><div class="tp-name">HTML / CSS / JS</div><div class="tp-desc">Frontend interface</div></div></div>
+        <div class="tech-pill"><span class="tp-icon">📊</span><div><div class="tp-name">matplotlib</div><div class="tp-desc">Spectrogram plots</div></div></div>
+      </div>
+    </div>
+
+    <!-- DATASET -->
+    <div class="dataset-card">
+      <h2>📂 Dataset — ICBHI 2017</h2>
+      <p>The International Conference on Biomedical Health Informatics (ICBHI) 2017 Respiratory Sound Database is one of the largest publicly available lung sound datasets. It was collected by research teams from Portugal and Greece across multiple hospitals.</p>
+      <div class="dataset-stats">
+        <div class="ds-stat"><div class="ds-num">6,898</div><div class="ds-label">Respiratory cycles</div></div>
+        <div class="ds-stat"><div class="ds-num">920</div><div class="ds-label">Audio recordings</div></div>
+        <div class="ds-stat"><div class="ds-num">126</div><div class="ds-label">Patients</div></div>
+        <div class="ds-stat"><div class="ds-num">5.5h</div><div class="ds-label">Total audio</div></div>
+        <div class="ds-stat"><div class="ds-num">4</div><div class="ds-label">Sound classes</div></div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-box">
+      <h2>Try the Live Demo</h2>
+      <p>Upload any lung sound .wav file and see the AI model in action.</p>
+      <a href="/predict" class="btn-primary">🎙️ Start Diagnosis</a>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>🫁 LungSense AI — Mini Project, B.E. CSE &nbsp;|&nbsp; Dataset: <a href="https://bhichallenge.med.auth.gr" target="_blank">ICBHI 2017</a> &nbsp;|&nbsp; Built with ❤️ using Python & Flask</p>
+  </footer>
+
+</body>
+</html>

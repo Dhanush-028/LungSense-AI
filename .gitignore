@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+audio_and_txt_files/
+spectrograms/
+uploads/
+*.h5
+*.pkl
+*.db
+*.png
