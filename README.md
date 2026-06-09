@@ -34,11 +34,5 @@ AI-powered lung sound classification web app using ICBHI 2017 dataset.
 
 
 
-\## Models
 
-Download from Google Drive and place in project folder:
-
-\- cnn\_model.h5
-
-\- baseline\_rf\_model.pkl
 
