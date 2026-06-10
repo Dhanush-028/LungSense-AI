@@ -76,7 +76,10 @@ all_labels   = []
 skipped      = 0
 processed    = 0
 
-wav_files = [f for f in os.listdir(DATA_FOLDER) if f.endswith(".wav")]
+if os.path.exists(DATA_FOLDER):
+    wav_files = [f for f in os.listdir(DATA_FOLDER) if f.endswith(".wav")]
+else:
+    wav_files = []
 total = len(wav_files)
 
 for idx, file in enumerate(wav_files):
