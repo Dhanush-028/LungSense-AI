@@ -74,13 +74,15 @@ rf_model  = None
 rf_le     = None
 rf_scaler = None
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 for pkl in ["baseline_rf_model.pkl", "respiratory_model.pkl"]:
-    if os.path.exists(pkl):
-        d         = joblib.load(pkl)
-        rf_model  = d["model"]
-        rf_le     = d["label_encoder"]
-        rf_scaler = d.get("scaler", None)
-        print(f"  ✔ Random Forest loaded from {pkl}  (fallback / ensemble)")
+    pkl_path = os.path.join(BASE_DIR, pkl)
+    if os.path.exists(pkl_path):
+        d          = joblib.load(pkl_path)
+        rf_model   = d["model"]
+        rf_le      = d["label_encoder"]
+        rf_scaler  = d.get("scaler", None)
+        print(f"  ✓ Random Forest loaded from {pkl}  (fallback / ensemble)")
         break
 
 if not rf_model:
