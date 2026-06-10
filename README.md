@@ -1,4 +1,4 @@
-\# 🫁 LungSense AI
+p\# 🫁 LungSense AI
 
 AI-powered lung sound classification web app using ICBHI 2017 dataset.
 
