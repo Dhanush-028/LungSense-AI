@@ -505,5 +505,5 @@ if __name__ == "__main__":
     print("  Open browser : http://127.0.0.1:5000")
     print("  For Android  : use ngrok URL")
     print("=" * 55 + "\n")
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 8000))
     app.run(host="0.0.0.0", port=port, debug=False)
